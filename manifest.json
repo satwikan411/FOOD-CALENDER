@@ -8,19 +8,15 @@
   "theme_color": "#4f46e5",
   "icons": [
     {
-      "src": "https://raw.githubusercontent.com/twitter/twemoji/master/assets/72x72/1f35b.png",
-      "sizes": "72x72",
-      "type": "image/png"
+      "src": "./icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
     },
     {
-      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e7/Emoji_u1f35b.svg/192px-Emoji_u1f35b.svg.png",
-      "sizes": "192x192",
-      "type": "image/png"
-    },
-    {
-      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e7/Emoji_u1f35b.svg/512px-Emoji_u1f35b.svg.png",
-      "sizes": "512x512",
-      "type": "image/png"
+      "src": "./icon.svg",
+      "sizes": "192x192 512x512",
+      "type": "image/svg+xml"
     }
   ]
 }
