@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#ffffff" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="mobile-web-app-capable" content="yes" />
-  <title>Emoji Food & Habit Calendar</title>
+  <title>Emoji Food &amp; Habit Calendar</title>
   <style>
     :root {
       --bg: #f8fafc;
@@ -50,7 +50,6 @@
       flex-direction: column;
     }
 
-    /* Header */
     .header {
       padding: 14px 16px;
       border-bottom: 1px solid var(--border);
@@ -112,7 +111,6 @@
       opacity: 0.8;
     }
 
-    /* Calendar Grid */
     .weekdays {
       display: grid;
       grid-template-columns: repeat(7, 1fr);
@@ -174,7 +172,6 @@
       color: #ffffff;
     }
 
-    /* Compact emoji container sized for up to 15 mini emojis */
     .emoji-box {
       display: flex;
       flex-wrap: wrap;
@@ -204,7 +201,6 @@
       align-items: center;
     }
 
-    /* Modal Backdrop */
     .modal-backdrop {
       position: fixed;
       inset: 0;
@@ -286,7 +282,6 @@
       margin-bottom: 8px;
     }
 
-    /* Logged Items List in Day Popup */
     .logged-list {
       display: flex;
       flex-direction: column;
@@ -336,7 +331,6 @@
       border: 1px dashed var(--border);
     }
 
-    /* Quick-Add Grid in Day Popup */
     .quick-add-grid {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
@@ -373,7 +367,486 @@
       white-space: nowrap;
     }
 
-    /* Global Emoji Legend Editor */
     .add-legend-form {
       display: flex;
-      gap
+      gap: 8px;
+    }
+
+    .input-emoji {
+      width: 56px;
+      text-align: center;
+      font-size: 1.3rem;
+      padding: 8px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: var(--bg);
+    }
+
+    .input-meaning {
+      flex: 1;
+      padding: 8px 12px;
+      font-size: 0.9rem;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: var(--bg);
+    }
+
+    .primary-btn {
+      padding: 8px 14px;
+      border-radius: 10px;
+      border: none;
+      background: var(--primary);
+      color: #ffffff;
+      font-weight: 600;
+      font-size: 0.88rem;
+      cursor: pointer;
+    }
+
+    .legend-edit-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .legend-edit-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .legend-edit-row .emoji-tag {
+      font-size: 1.4rem;
+      width: 38px;
+      text-align: center;
+    }
+
+    .legend-edit-row input {
+      flex: 1;
+      padding: 8px 10px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      font-size: 0.9rem;
+    }
+
+    .del-legend-btn {
+      border: none;
+      background: transparent;
+      color: var(--muted);
+      font-size: 1rem;
+      padding: 6px;
+      cursor: pointer;
+    }
+
+    .del-legend-btn:hover {
+      color: var(--danger);
+    }
+
+    .hint-text {
+      font-size: 0.78rem;
+      color: var(--muted);
+      line-height: 1.4;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="app-container">
+    <div class="header">
+      <div class="month-nav">
+        <button class="nav-btn" id="prevMonthBtn" aria-label="Previous Month">&#8249;</button>
+        <div class="month-title" id="monthTitle">Month Year</div>
+        <button class="nav-btn" id="nextMonthBtn" aria-label="Next Month">&#8250;</button>
+      </div>
+      <button class="legend-btn" id="openLegendBtn">&#9998; Emoji Meanings</button>
+    </div>
+
+    <div class="weekdays">
+      <div class="weekday">Sun</div>
+      <div class="weekday">Mon</div>
+      <div class="weekday">Tue</div>
+      <div class="weekday">Wed</div>
+      <div class="weekday">Thu</div>
+      <div class="weekday">Fri</div>
+      <div class="weekday">Sat</div>
+    </div>
+
+    <div class="days-grid" id="daysGrid"></div>
+  </div>
+
+  <!-- Day Details & Add Popup -->
+  <div class="modal-backdrop" id="dayModalBackdrop">
+    <div class="modal">
+      <div class="modal-header">
+        <div class="modal-title" id="dayModalTitle">Date</div>
+        <button class="close-btn" id="closeDayModalBtn">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div>
+          <div class="section-label">Logged on this day</div>
+          <div class="logged-list" id="loggedList"></div>
+        </div>
+
+        <div>
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+            <div class="section-label" style="margin-bottom:0;">Tap to add item</div>
+            <button class="legend-btn" id="jumpToLegendBtn" style="padding:4px 8px; font-size:0.75rem;">Edit Meanings</button>
+          </div>
+          <div class="quick-add-grid" id="quickAddGrid"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Global Emoji Meaning Editor Popup -->
+  <div class="modal-backdrop" id="legendModalBackdrop">
+    <div class="modal">
+      <div class="modal-header">
+        <div class="modal-title">Global Emoji Meanings</div>
+        <button class="close-btn" id="closeLegendModalBtn">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p class="hint-text">
+          Assign any meaning to any emoji (even non-literal ones). Editing a meaning here automatically updates it across <strong>all dates and months</strong>.
+        </p>
+
+        <div>
+          <div class="section-label">Add New Emoji</div>
+          <form class="add-legend-form" id="addLegendForm">
+            <input type="text" class="input-emoji" id="newEmojiInput" placeholder="🍕" maxlength="4" required />
+            <input type="text" class="input-meaning" id="newMeaningInput" placeholder="e.g., Biryani / Cheat Meal" required />
+            <button type="submit" class="primary-btn">Add</button>
+          </form>
+        </div>
+
+        <div>
+          <div class="section-label">Your Saved Meanings</div>
+          <div class="legend-edit-list" id="legendEditList"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const STORAGE_KEY_LOGS = "emoji_cal_logs_v1";
+    const STORAGE_KEY_LEGEND = "emoji_cal_legend_v1";
+
+    const DEFAULT_LEGEND = {
+      "🍛": "Biryani",
+      "🧇": "Waffle",
+      "🍦": "Ice Cream",
+      "🍕": "Pizza",
+      "🍔": "Burger",
+      "🍜": "Noodles / Ramen",
+      "🍰": "Cake / Dessert",
+      "☕": "Cold Coffee / Chai",
+      "🐉": "Extra Spicy Feast",
+      "🥗": "Healthy Salad Bowl"
+    };
+
+    let currentDate = new Date();
+    let viewYear = currentDate.getFullYear();
+    let viewMonth = currentDate.getMonth();
+    let selectedDateKey = null;
+
+    let legend = loadLegend();
+    let logs = loadLogs();
+
+    function loadLegend() {
+      try {
+        const saved = localStorage.getItem(STORAGE_KEY_LEGEND);
+        return saved ? JSON.parse(saved) : { ...DEFAULT_LEGEND };
+      } catch (e) {
+        return { ...DEFAULT_LEGEND };
+      }
+    }
+
+    function saveLegend() {
+      localStorage.setItem(STORAGE_KEY_LEGEND, JSON.stringify(legend));
+    }
+
+    function loadLogs() {
+      try {
+        const saved = localStorage.getItem(STORAGE_KEY_LOGS);
+        if (saved) return JSON.parse(saved);
+      } catch (e) {}
+
+      const y = currentDate.getFullYear();
+      const m = String(currentDate.getMonth() + 1).padStart(2, "0");
+      const sampleKey = `${y}-${m}-02`;
+      return {
+        [sampleKey]: ["🍛", "🍦"]
+      };
+    }
+
+    function saveLogs() {
+      localStorage.setItem(STORAGE_KEY_LOGS, JSON.stringify(logs));
+    }
+
+    function formatDateKey(year, month, day) {
+      const m = String(month + 1).padStart(2, "0");
+      const d = String(day).padStart(2, "0");
+      return `${year}-${m}-${d}`;
+    }
+
+    function formatReadableDate(dateKey) {
+      const [y, m, d] = dateKey.split("-").map(Number);
+      const dt = new Date(y, m - 1, d);
+      return dt.toLocaleDateString(undefined, {
+        weekday: "short",
+        month: "long",
+        day: "numeric",
+        year: "numeric"
+      });
+    }
+
+    function renderCalendar() {
+      const monthTitle = document.getElementById("monthTitle");
+      const daysGrid = document.getElementById("daysGrid");
+
+      const firstDay = new Date(viewYear, viewMonth, 1);
+      const lastDay = new Date(viewYear, viewMonth + 1, 0);
+      const startWeekday = firstDay.getDay();
+      const totalDays = lastDay.getDate();
+
+      monthTitle.textContent = firstDay.toLocaleDateString(undefined, {
+        month: "long",
+        year: "numeric"
+      });
+
+      daysGrid.innerHTML = "";
+
+      const todayKey = formatDateKey(
+        currentDate.getFullYear(),
+        currentDate.getMonth(),
+        currentDate.getDate()
+      );
+
+      for (let i = 0; i < startWeekday; i++) {
+        const emptyCell = document.createElement("div");
+        emptyCell.className = "day-cell empty";
+        daysGrid.appendChild(emptyCell);
+      }
+
+      for (let day = 1; day <= totalDays; day++) {
+        const dateKey = formatDateKey(viewYear, viewMonth, day);
+        const cell = document.createElement("div");
+        cell.className = "day-cell" + (dateKey === todayKey ? " today" : "");
+
+        const num = document.createElement("div");
+        num.className = "day-number";
+        num.textContent = day;
+        cell.appendChild(num);
+
+        const emojiBox = document.createElement("div");
+        emojiBox.className = "emoji-box";
+
+        const dayEmojis = logs[dateKey] || [];
+        const maxVisible = 15;
+        const visibleList = dayEmojis.slice(0, maxVisible);
+
+        visibleList.forEach((em) => {
+          const span = document.createElement("span");
+          span.className = "mini-emoji";
+          span.textContent = em;
+          emojiBox.appendChild(span);
+        });
+
+        if (dayEmojis.length > maxVisible) {
+          const more = document.createElement("span");
+          more.className = "more-badge";
+          more.textContent = `+${dayEmojis.length - maxVisible}`;
+          emojiBox.appendChild(more);
+        }
+
+        cell.appendChild(emojiBox);
+        cell.addEventListener("click", () => openDayModal(dateKey));
+        daysGrid.appendChild(cell);
+      }
+
+      const totalCells = startWeekday + totalDays;
+      const remainder = totalCells % 7;
+      if (remainder !== 0) {
+        for (let i = 0; i < 7 - remainder; i++) {
+          const emptyCell = document.createElement("div");
+          emptyCell.className = "day-cell empty";
+          daysGrid.appendChild(emptyCell);
+        }
+      }
+    }
+
+    function openDayModal(dateKey) {
+      selectedDateKey = dateKey;
+      document.getElementById("dayModalTitle").textContent = formatReadableDate(dateKey);
+      renderDayModalContent();
+      document.getElementById("dayModalBackdrop").classList.add("open");
+    }
+
+    function closeDayModal() {
+      document.getElementById("dayModalBackdrop").classList.remove("open");
+      selectedDateKey = null;
+    }
+
+    function renderDayModalContent() {
+      if (!selectedDateKey) return;
+
+      const loggedList = document.getElementById("loggedList");
+      const quickAddGrid = document.getElementById("quickAddGrid");
+      const items = logs[selectedDateKey] || [];
+
+      loggedList.innerHTML = "";
+      if (items.length === 0) {
+        loggedList.innerHTML = `<div class="empty-state">Nothing logged for this date yet. Tap an item below to add it.</div>`;
+      } else {
+        items.forEach((emoji, idx) => {
+          const row = document.createElement("div");
+          row.className = "logged-item";
+
+          const meaning = legend[emoji] || "(No meaning set)";
+          row.innerHTML = `
+            <div class="logged-item-info">
+              <span class="logged-item-emoji">${emoji}</span>
+              <span>— ${escapeHtml(meaning)}</span>
+            </div>
+            <button class="remove-btn" data-index="${idx}">Remove</button>
+          `;
+
+          row.querySelector(".remove-btn").addEventListener("click", () => {
+            logs[selectedDateKey].splice(idx, 1);
+            if (logs[selectedDateKey].length === 0) {
+              delete logs[selectedDateKey];
+            }
+            saveLogs();
+            renderDayModalContent();
+            renderCalendar();
+          });
+
+          loggedList.appendChild(row);
+        });
+      }
+
+      quickAddGrid.innerHTML = "";
+      Object.entries(legend).forEach(([emoji, meaning]) => {
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "quick-chip";
+        btn.innerHTML = `<span class="e">${emoji}</span><span class="m">${escapeHtml(meaning)}</span>`;
+        btn.addEventListener("click", () => {
+          if (!logs[selectedDateKey]) logs[selectedDateKey] = [];
+          logs[selectedDateKey].push(emoji);
+          saveLogs();
+          renderDayModalContent();
+          renderCalendar();
+        });
+        quickAddGrid.appendChild(btn);
+      });
+    }
+
+    function openLegendModal() {
+      renderLegendEditor();
+      document.getElementById("legendModalBackdrop").classList.add("open");
+    }
+
+    function closeLegendModal() {
+      document.getElementById("legendModalBackdrop").classList.remove("open");
+      if (selectedDateKey) {
+        renderDayModalContent();
+      }
+    }
+
+    function renderLegendEditor() {
+      const list = document.getElementById("legendEditList");
+      list.innerHTML = "";
+
+      Object.entries(legend).forEach(([emoji, meaning]) => {
+        const row = document.createElement("div");
+        row.className = "legend-edit-row";
+
+        const emojiSpan = document.createElement("span");
+        emojiSpan.className = "emoji-tag";
+        emojiSpan.textContent = emoji;
+
+        const input = document.createElement("input");
+        input.type = "text";
+        input.value = meaning;
+        input.placeholder = "Enter meaning...";
+        input.addEventListener("input", (e) => {
+          legend[emoji] = e.target.value;
+          saveLegend();
+        });
+
+        const delBtn = document.createElement("button");
+        delBtn.type = "button";
+        delBtn.className = "del-legend-btn";
+        delBtn.title = "Delete from legend";
+        delBtn.innerHTML = "&#128465;";
+        delBtn.addEventListener("click", () => {
+          delete legend[emoji];
+          saveLegend();
+          renderLegendEditor();
+        });
+
+        row.appendChild(emojiSpan);
+        row.appendChild(input);
+        row.appendChild(delBtn);
+        list.appendChild(row);
+      });
+    }
+
+    function escapeHtml(str) {
+      return str
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;");
+    }
+
+    document.getElementById("prevMonthBtn").addEventListener("click", () => {
+      viewMonth--;
+      if (viewMonth < 0) {
+        viewMonth = 11;
+        viewYear--;
+      }
+      renderCalendar();
+    });
+
+    document.getElementById("nextMonthBtn").addEventListener("click", () => {
+      viewMonth++;
+      if (viewMonth > 11) {
+        viewMonth = 0;
+        viewYear++;
+      }
+      renderCalendar();
+    });
+
+    document.getElementById("closeDayModalBtn").addEventListener("click", closeDayModal);
+    document.getElementById("dayModalBackdrop").addEventListener("click", (e) => {
+      if (e.target.id === "dayModalBackdrop") closeDayModal();
+    });
+
+    document.getElementById("openLegendBtn").addEventListener("click", openLegendModal);
+    document.getElementById("jumpToLegendBtn").addEventListener("click", () => {
+      openLegendModal();
+    });
+
+    document.getElementById("closeLegendModalBtn").addEventListener("click", closeLegendModal);
+    document.getElementById("legendModalBackdrop").addEventListener("click", (e) => {
+      if (e.target.id === "legendModalBackdrop") closeLegendModal();
+    });
+
+    document.getElementById("addLegendForm").addEventListener("submit", (e) => {
+      e.preventDefault();
+      const emojiVal = document.getElementById("newEmojiInput").value.trim();
+      const meaningVal = document.getElementById("newMeaningInput").value.trim();
+      if (!emojiVal || !meaningVal) return;
+
+      legend[emojiVal] = meaningVal;
+      saveLegend();
+      document.getElementById("newEmojiInput").value = "";
+      document.getElementById("newMeaningInput").value = "";
+      renderLegendEditor();
+    });
+
+    renderCalendar();
+  </script>
+</body>
+</html>
